@@ -92,29 +92,34 @@
 	var signDivSignIn = document.getElementById('signDiv-signIn');
 	var signDivSignUp = document.getElementById('signDiv-signUp');
 	var signDivPassword = document.getElementById('signDiv-password');
-    var lul = document.getElementById('refresh');
-	
-    lul.onclick = function(){
+    var refresh = document.getElementById('refresh');
+    //Refresh Leaderboard
+    refresh.onclick = function(){
 		socket.emit('refreshLeaderbaord');
 	}
+    	//sign in 
 	signDivSignIn.onclick = function(){
 		socket.emit('signIn',{username:signDivUsername.value,password:signDivPassword.value});
 	}
+	//sign up
 	signDivSignUp.onclick = function(){
 		socket.emit('signUp',{username:signDivUsername.value,password:signDivPassword.value});
 	}
+    //select mage
     mage.onclick = function(){
         socket.emit('mage',{username:signDivUsername.value,playertype:'mage'});
         pickChar.style.display = 'none';
         gameDiv.style.display = 'inline-block';
         createMatch();
 	}
+    //select bruiser
     bruiser.onclick = function(){
         socket.emit('mage',{username:signDivUsername.value,playertype:'bruiser'});
         pickChar.style.display = 'none';
         gameDiv.style.display = 'inline-block';
         createMatch();
 	}
+    	//successful sign in
 	socket.on('signInResponse',function(data){
         console.log(data.playertype);
 		if(data.success){
@@ -131,12 +136,14 @@
 			alert("Sign in unsuccessul.");
         }
 	});
+	//successful sign up
 	socket.on('signUpResponse',function(data){
 		if(data.success){
 			alert("Sign up successul.");
 		} else
 			alert("Sign up unsuccessul.");
 	});
+    //Inital leaderboard
     socket.on('leaderboard', function(data){
      var leaderboard = data.leaderb;
      var ul = document.getElementById("leader");
@@ -178,7 +185,7 @@
 			socket.emit('sendMsgToServer',chatInput.value);
 		chatInput.value = '';		
 	}
-    
+    //Create Room
     var createMatch = function() {
       var text = "";
       var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -216,7 +223,7 @@
 	var ctx = document.getElementById("ctx").getContext("2d");
 	var ctxUi = document.getElementById("ctx-ui").getContext("2d");
 	ctxUi.font = '30px Arial';
-	
+	//initalist player
 	var Player = function(initPack){
 		var self = {};
 		self.id = initPack.id;
@@ -256,7 +263,7 @@
 	}
 	Player.list = {};
 
-		
+	//initalise bullet
 	var Bullet = function(initPack){
 		var self = {};
 		self.id = initPack.id;
@@ -295,7 +302,7 @@
 			new Bullet(data.bullet[i]);
 		}
 	});
-	
+	//update
 	socket.on('update',function(data){
 		for(var i = 0 ; i < data.player.length; i++){
 			var pack = data.player[i];
@@ -324,7 +331,7 @@
 			}
 		}
 	});
-	
+	//player disconnect
 	socket.on('remove',function(data){
 		for(var i = 0 ; i < data.player.length; i++){
 			delete Player.list[data.player[i]];
@@ -344,7 +351,7 @@
 		for(var i in Bullet.list)
 			Bullet.list[i].draw();
 	},40);
-	
+	//draw map
 	var drawMap = function(){
 		var player = Player.list[selfId];
 		var x = WIDTH/2 - player.x;
@@ -352,7 +359,7 @@
 		ctx.drawImage(Img.map['field'],x,y);
 	}
 	
-	
+	//Key press
 	document.onkeydown = function(event){
 		if(event.keyCode === 68)	//d
 			socket.emit('keyPress',{inputId:'right',state:true});

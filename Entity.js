@@ -37,6 +37,7 @@ Entity = function(param){
 	}
 	return self;
 }
+//Update Frames
 Entity.getFrameUpdateData = function(){
 	var pack = {
 		initPack:{
@@ -59,6 +60,7 @@ Entity.getFrameUpdateData = function(){
 	return pack;
 }
 
+//Get users online
 Entity.getSockets = function(data){
    SOCKET_LIST = data;
 }
@@ -92,6 +94,7 @@ Player = function(param){
 		if(self.pressingAttack){
             self.shootBullet(self.mouseAngle);
 		}
+	//Ultimate Ability
         if(self.pressingUlti){
             if(self.playertype == 'mage'){
                 if(self.ultiUp == true){
@@ -102,6 +105,7 @@ Player = function(param){
                     self.ultiUp = false;  
                     cd();
                 }
+		//cooldown
                 function cd(){
                      var coolDown = setInterval(function(){
                             self.ultiUp = true;
@@ -136,6 +140,7 @@ Player = function(param){
 
 	}
     }
+	//shoot bullet
 	self.shootBullet = function(angle){
             Bullet({
                 parent:self.id,
@@ -201,7 +206,7 @@ Player.onConnect = function(socket,username,progress){
 		socket:socket,
 		progress:progress,
 	});
-
+	//On Key Press
 	socket.on('keyPress',function(data){
 		if(data.inputId === 'left')
 			player.pressingLeft = data.state;
@@ -218,13 +223,13 @@ Player.onConnect = function(socket,username,progress){
 		else if(data.inputId === 'mouseAngle')
 			player.mouseAngle = data.state;
 	});
-	
+	//Change Room
 	socket.on('changeMap',function(data){
 		if(data.map)
 			player.map = data.map;
 	});
     
-	
+	//Messaging
 	socket.on('sendMsgToServer',function(data){
 		for(var i in SOCKET_LIST){
 			SOCKET_LIST[i].emit('addToChat',player.username + ': ' + data);
