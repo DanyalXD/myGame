@@ -1,4 +1,4 @@
-
+//Get other files
 require('./Database');
 require('./Entity');
 require('./client/Inventory');
@@ -26,17 +26,18 @@ var io = require('socket.io')(serv,{});
 io.sockets.on('connection', function(socket){
 	socket.id = Math.random();
 	SOCKET_LIST[socket.id] = socket;
-	
+	//On sign in
 	socket.on('signIn',function(data){ 
 		Database.isValidPassword(data,function(res){
 			if(!res)
 				return socket.emit('signInResponse',{success:false});
-
+		//Get Player type
                 Database.getPlayerType(data.username,function(progress){
                     Player.onConnect(socket,data.username, progress);
                         socket.emit('signInResponse',{success:true, progress:progress});
                 })
 		});
+	//inital leader board
         Database.leaderBoard(function(leaderboard){
             var leaderBoard = [];
             for(i = 0; i < leaderboard.length; i++){
@@ -49,7 +50,7 @@ io.sockets.on('connection', function(socket){
         });
 
 	});
-    
+    //Refresh Leaderboard
     socket.on('refreshLeaderbaord', function(){
         Database.leaderBoard(function(leaderboard){
             var leaderBoard = [];
@@ -62,6 +63,7 @@ io.sockets.on('connection', function(socket){
             socket.emit('leaderboard', {leaderb:leaderBoard});
         });
     });
+	//On sign up
 	socket.on('signUp',function(data){
 		Database.isUsernameTaken(data,function(res){
 			if(res){
@@ -73,7 +75,7 @@ io.sockets.on('connection', function(socket){
 			}
 		});		
 	});
-	
+    //Set Character Type
     socket.on('mage',function(data){
 		Database.updatePlayerType(data,function(res){
             if(res){
@@ -84,6 +86,7 @@ io.sockets.on('connection', function(socket){
             }
 		});		
 	});
+	//User Disconnect
 	socket.on('disconnect',function(){
 		delete SOCKET_LIST[socket.id];
 		Player.onDisconnect(socket);
